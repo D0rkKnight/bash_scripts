@@ -1,0 +1,50 @@
+#!/bin/bash
+
+# Parse command-line arguments or use default values
+while [[ $# -gt 0 ]]; do
+    key="$1"
+    case $key in
+        -s|--system-dir)
+            nano_sys_dir="$2"
+            shift
+            shift
+            ;;
+        -c|--custom-file)
+            custom_nanorc="$2"
+            shift
+            shift
+            ;;
+        *)
+            echo "Unknown option: $1"
+            exit 1
+            ;;
+    esac
+done
+
+# Set default values if not provided
+nano_sys_dir="${nano_sys_dir:-/usr/share/nano}"
+custom_nanorc="${custom_nanorc:-$HOME/.nanorc}"
+
+# Create or truncate the custom nanorc file
+> "$custom_nanorc"
+
+# Array to store included files
+included_files=()
+
+# Iterate through each .nanorc file in the specified directory
+for nanorc_file in "$nano_sys_dir"/*.nanorc; do
+    # Get the filename without the directory path
+    file_name="$(basename "$nanorc_file")"
+    
+    # Check if the file has not been included before
+    if [[ ! " ${included_files[@]} " =~ " ${file_name} " ]]; then
+        while IFS= read -r line; do
+            echo "$line" >> "$custom_nanorc"
+        done < "$nanorc_file"
+
+        # Add the included file to the array
+        included_files+=("$file_name")
+    fi
+done
+
+echo "Custom nanorc file updated with system-wide syntax highlighting definitions."

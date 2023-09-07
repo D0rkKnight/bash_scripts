@@ -12,5 +12,14 @@ else
     echo "Custom scripts directory is already in PATH."
 fi
 
+# Check if the function sourcing already exists in .bashrc
+if ! grep -q "source ~/bash_scripts/functions.sh" ~/.bashrc; then
+    echo "Adding function sourcing to .bashrc..."
+    echo "source ~/bash_scripts/functions.sh" >> ~/.bashrc
+    echo "Done! Functions are now sourced from .bashrc."
+else
+    echo "Function sourcing is already in .bashrc."
+fi
+
 # Loading in custom script functions
 source functions.sh
