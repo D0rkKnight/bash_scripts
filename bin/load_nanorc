@@ -33,17 +33,15 @@ included_files=()
 
 # Iterate through each .nanorc file in the specified directory
 for nanorc_file in "$nano_sys_dir"/*.nanorc; do
-    # Get the filename without the directory path
-    file_name="$(basename "$nanorc_file")"
-    
-    # Check if the file has not been included before
-    if [[ ! " ${included_files[@]} " =~ " ${file_name} " ]]; then
-        while IFS= read -r line; do
-            echo "$line" >> "$custom_nanorc"
-        done < "$nanorc_file"
-
-        # Add the included file to the array
-        included_files+=("$file_name")
+    # Check if the file exists
+    if [[ -f "$nanorc_file" ]]; then
+        # Get the filename without the directory path
+        file_name="$(basename "$nanorc_file")"
+        
+        # Add the 'include' line to the custom nanorc
+        echo "include $nano_sys_dir/$file_name" >> "$custom_nanorc"
+    else
+        echo "File not found: $nanorc_file"
     fi
 done
 
